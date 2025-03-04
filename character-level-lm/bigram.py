@@ -45,4 +45,25 @@ for i in range(10):
         out.append(int_to_char[idx])
         if(idx==0):
             break
-    print(''.join(out))
+    # print(''.join(out))
+
+log_likelihood = 0.0
+n = 0
+
+for name in names[:5]:
+    tokens = ["<>"] + list(name) + ["<>"]
+    for c1, c2 in zip(tokens, tokens[1:]):
+        c1_int = char_to_int[c1]
+        c2_int = char_to_int[c2]
+        prob = pre[c1_int, c2_int]
+
+        log_prob = torch.log(prob)
+        log_likelihood+=log_prob
+        n+=1
+        print(f"{c1}{c2} {prob:.3f} {log_prob:.3f}")
+
+print(f"log likelihood = {log_likelihood}")
+
+nll = -log_likelihood/n   
+print(f"log likelihood (avg)= {nll}") # the lower the number is, the better the model is.
+
