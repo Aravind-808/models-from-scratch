@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import torch
+from utils import init_charint_map
 
 names = open(r"character-level-lm\names.txt",'r').read().splitlines()
 charset = sorted(list(set("".join(names))))
@@ -8,10 +9,7 @@ charset = sorted(list(set("".join(names))))
 #     for ch1, ch2, ch3 in zip(name, name[1:], name[2:]):
 #        print(ch1,ch2,ch3)
 
-
-ctoi = {char: index+1 for index, char in enumerate(charset)}
-ctoi["<>"] = 0
-itoc = {index: char for char, index in ctoi.items()}
+ctoi, itoc = init_charint_map(charset)
 
 N = torch.zeros((27,27,27), dtype=torch.float32)
 
@@ -22,10 +20,10 @@ for name in names:
         n2 = ctoi[ch2]
         n3 = ctoi[ch3]
         N[n1,n2,n3] +=1
+
 # print(N.max())
 precompute = (N+1).float()
 precompute/=precompute.sum(2, keepdim=True)
-
 # print(precompute)
 
 gen = torch.Generator().manual_seed(3323298)

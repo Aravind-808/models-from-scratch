@@ -1,22 +1,18 @@
 import torch
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
+from utils import init_tensor_array, init_charint_map
 
 names = open(r"character-level-lm\names.txt").read().splitlines()
 
 gen = torch.Generator().manual_seed(3273827392)
-N = torch.zeros((27,27), dtype=torch.int32)
-char_array = sorted(list(set(''.join(names))))
 
-char_to_int = {char: int+1 for (int, char) in enumerate(char_array)}
-char_to_int['<>'] = 0 
-int_to_char = {index: char for (char, index) in char_to_int.items()}
+N, char_array  = init_tensor_array(names)
+char_to_int, int_to_char = init_charint_map(char_array)
 
 '''
 To feed data and labels into the neural network, we first initialize the training sets (labels and data)
-
 The network will return for the input of one character,the probability distribution of the next char.
-
 '''
 xs, ys = [],[]
 
@@ -39,6 +35,7 @@ One hot encoding returns a vector with every value as 0 and the occourence of te
 '''
 x_encoded = F.one_hot(xs, num_classes=27).float()
 print(x_encoded.shape)
+
 # plt.imshow(x_encoded)
 # plt.show()
  
@@ -62,11 +59,7 @@ count_logits  = logits.exp()
 # Just like we did with the count method, we take the probability
 probabilities = count_logits/count_logits.sum(1, keepdims=True)
 
-# results in 1
-print(round(probabilities[0].sum().item()))
-
 # Taking "emma" as an example
-
 test = torch.zeros(5)
 
 neg_log = torch.zeros(5)
@@ -82,7 +75,7 @@ for i in range(5):
     print(f"Probability assigned by the network: {prob.item()}")
     log_likelihood = torch.log(prob)
     neg_log_likelihood = -log_likelihood
-    print(f"Negative log likelohood: {neg_log_likelihood}")
+    print(f"Negative log likelihood: {neg_log_likelihood}")
     neg_log[i] = neg_log_likelihood
 
 avg_nll = neg_log.mean()
