@@ -1,9 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
-import torch.utils.data as data
 import math
-import copy
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, d, heads):
@@ -35,9 +32,9 @@ class MultiHeadAttention(nn.Module):
     
     def combine_heads(self, x):
         batch_size, num, seq_length,  d_k = x.size()
-        return x.transpose(1, 2).contiguous().view(batch_size, seq_length, self.d_k)
+        return x.transpose(1, 2).contiguous().view(batch_size, seq_length, self.d)
 
-    def feed_forward(self, Q, K, V, mask = None):
+    def forward(self, Q, K, V, mask = None):
         Q = self.split_heads(self.W_q(Q))
         K = self.split_heads(self.W_k(K))
         V = self.split_heads(self.W_v(V))

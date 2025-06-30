@@ -1,8 +1,6 @@
-import torch 
 import torch.nn as nn
 from attention import MultiHeadAttention
 from feedforward import PositionWiseFeedForward
-from positional_encoding import PositionalEncoding
 
 class Decoder(nn.Module):
     def __init__(self, d, heads, d_ff, dropout):
