@@ -38,7 +38,7 @@ def collate_fn(batch):
     tgt_batch = pad_sequence(tgt_batch, batch_first=True, padding_value=PAD_IDX)
     return src_batch, tgt_batch
 
-dataset = load_dataset("opus_books", "en-fr", split="train[:15000]")
+dataset = load_dataset("opus_books", "en-fr", split="train[:40000]")
 
 print(len(dataset))
 
@@ -49,14 +49,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = Transformer(
     source_vocab_size=len(src_vocab),
     target_vocab_size=len(tgt_vocab),
-    d=512, heads=8, num_layers=4, d_ff=2048,
+    d=512, heads=4, num_layers=2, d_ff=2048,
     max_seq_len=512, dropout=0.1
 ).to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 
-EPOCHS = 2
+EPOCHS = 1
 for epoch in range(EPOCHS):
     model.train()
     total_loss = 0
@@ -80,4 +80,4 @@ for epoch in range(EPOCHS):
 
     print(f"Epoch {epoch+1} | Avg Loss: {total_loss / len(train_loader):.4f}")
 
-torch.save(model.state_dict(), "transformer/models/transformer_final.pth")
+torch.save(model.state_dict(), "transformer/models/transformer_final_2.pth")
