@@ -61,3 +61,4 @@ if __name__ == "__main__":
         if text.lower() in ["quit", "exit"]:
             break
         print("french: ", translate(text))
+
