@@ -69,7 +69,7 @@ def generate_lyrics(model, tokenizer, prompt, max_new_tokens=50, temperature=1.0
 
             topk_logits, topk_indices = torch.topk(logits, top_k)
             probs = torch.softmax(topk_logits, dim=-1)
-            sample_idx = torch.multinomial(probs, num_samples=1)         # shape: [1, 1]
+            sample_idx = torch.multinomial(probs, num_samples=1) 
             next_token = topk_indices.gather(1, sample_idx) 
 
         generated = torch.cat((generated, next_token), dim=1)

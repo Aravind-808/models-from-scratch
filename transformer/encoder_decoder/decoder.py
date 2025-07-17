@@ -1,6 +1,6 @@
 import torch.nn as nn
-from attention import MultiHeadAttention
-from feedforward import PositionWiseFeedForward
+from ..attention import MultiHeadAttention
+from ..feedforward import PositionWiseFeedForward
 
 class Decoder(nn.Module):
     '''

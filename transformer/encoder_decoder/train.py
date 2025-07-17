@@ -7,7 +7,7 @@ from datasets import load_dataset
 import spacy
 import pickle
 from tqdm import tqdm
-from transformer_architecture import Transformer
+from .transformer_architecture import Transformer
 
 spacy_en = spacy.load("en_core_web_sm")
 spacy_fr = spacy.load("fr_core_news_sm")
