@@ -7,6 +7,8 @@ from .transformer_architecture import DecoderOnlyTransformer
 import torch.nn as nn
 from tqdm import tqdm
 import warnings
+from sklearn.utils import shuffle
+
 warnings.filterwarnings("ignore")
 
 tokenizer = AutoTokenizer.from_pretrained("gpt2")
@@ -21,13 +23,13 @@ model = DecoderOnlyTransformer(
     target_vocab_size=tokenizer.vocab_size,
     d=512,
     heads=8,
-    num_layers=6,
+    num_layers=12,
     d_ff=2048,
     max_seq_len=256,
     dropout=0.1
 ).to(device)
 
-model.load_state_dict(torch.load(r"C:\Users\rajes\models-from-scratch\transformer\models\decoder_only.pth", map_location=device))
+model.load_state_dict(torch.load(r"C:\Users\rajes\models-from-scratch\transformer\models\decoder_only_2.pth", map_location=device))
 model.eval()
 
 # def generate_lyrics(prompt, max_new_tokens = 50):
@@ -53,7 +55,7 @@ model.eval()
 
 #     return generated_text
 
-def generate_lyrics(model, tokenizer, prompt, max_new_tokens=50, temperature=1.0, top_k=50,
+def generate_lyrics(model, tokenizer, prompt, max_new_tokens=150, temperature=1.0, top_k=50,
     device="cuda" if torch.cuda.is_available() else "cpu"
 ):
     model.eval()
@@ -85,7 +87,7 @@ if __name__ == "__main__":
     validation_percentage = 0.07
     test_percentage = 0.03
 
-    full_text = datasets['train']['text']
+    full_text = shuffle(datasets['train']['text'], random_state= 42)
     train_split, val_split, test_split = np.split(
         full_text,
         [int(len(full_text)*train_percentage), int(len(full_text)*(train_percentage + validation_percentage))]
@@ -98,21 +100,23 @@ if __name__ == "__main__":
     })
 
     tokenized_val = datasets["validation"].map(tokenize, batched=True)
-
-    text = input("Enter prompt: ")
-    prompt_tokens = tokenizer(text, return_tensors="pt", truncation=True, max_length=80)
-    prompt = tokenizer.decode(prompt_tokens["input_ids"][0], skip_special_tokens=True)
-    generated = generate_lyrics(model, tokenizer, prompt)
-    print(generated)
-
-    # samples = 3
-    # for i in range(samples):
-    #     input_text = datasets["test"][i]["text"]
-    #     prompt_tokens = tokenizer(input_text, return_tensors="pt", truncation=True, max_length=50)
+    # while True:    
+    #     text = input("Enter prompt (or exit): ")
+    #     if text.lower == "exit":
+    #         break
+    #     prompt_tokens = tokenizer(text, return_tensors="pt", truncation=True, max_length=80)
     #     prompt = tokenizer.decode(prompt_tokens["input_ids"][0], skip_special_tokens=True)
-    #     generated = generate_lyrics(prompt)
-    #     print(f"Input text:\n{input_text[:50]}")
-    #     print(f"Expected generation:\n{input_text[:100]}")
-    #     print(f"Output:\n{generated[:100]}\n\n")
+    #     generated = generate_lyrics(model, tokenizer, prompt)
+    #     print(generated)
+
+    samples = 3
+    for i in range(samples):
+        input_text = datasets["test"][i]["text"]
+        prompt_tokens = tokenizer(input_text, return_tensors="pt", truncation=True, max_length=50)
+        prompt = tokenizer.decode(prompt_tokens["input_ids"][0], skip_special_tokens=True)
+        generated = generate_lyrics(model, tokenizer, prompt)
+        print(f"Input text:\n{input_text[:50]}")
+        print(f"Expected generation:\n{input_text[:100]}")
+        print(f"Output:\n{generated[:100]}\n\n")
 
     # print(repr(datasets["test"][0]["text"]))

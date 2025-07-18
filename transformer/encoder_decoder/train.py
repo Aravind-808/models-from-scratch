@@ -9,6 +9,7 @@ import pickle
 from tqdm import tqdm
 from .transformer_architecture import Transformer
 
+torch.cuda.empty_cache()
 spacy_en = spacy.load("en_core_web_sm")
 spacy_fr = spacy.load("fr_core_news_sm")
 
@@ -38,7 +39,7 @@ def collate_fn(batch):
     tgt_batch = pad_sequence(tgt_batch, batch_first=True, padding_value=PAD_IDX)
     return src_batch, tgt_batch
 
-dataset = load_dataset("opus_books", "en-fr", split="train[:40000]")
+dataset = load_dataset("opus_books", "en-fr", split="train[:45000]")
 
 print(len(dataset))
 
@@ -74,10 +75,11 @@ for epoch in range(EPOCHS):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        torch.cuda.empty_cache()
         total_loss += loss.item()
 
         loop.set_postfix(loss=total_loss / (loop.n + 1e-9))
 
     print(f"Epoch {epoch+1} | Avg Loss: {total_loss / len(train_loader):.4f}")
 
-torch.save(model.state_dict(), "transformer/models/transformer_final_2.pth")
+torch.save(model.state_dict(), r"C:\Users\rajes\models-from-scratch\transformer\models\encoder_decoder.pth")
